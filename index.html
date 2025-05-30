@@ -91,7 +91,7 @@
                 <div class="form-header">
                     <h2>Application Form</h2>
                     <div class="application-note">
-                        <p>📝 <strong>Please think carefully about your responses.</strong> This application helps us understand who you are and what you're looking for. Be honest and thoughtful - there are no wrong answers, only authentic ones.</p>
+                        <p>📝 <strong>Please think carefully about your responses.</strong> Once you complete the application, you will not be able to edit it.</p>
                     </div>
                     <div class="progress-bar">
                         <div class="progress-fill" id="progress-fill"></div>
@@ -109,6 +109,38 @@
                         <div class="form-group">
                             <label for="email">Email Address *</label>
                             <input type="email" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="dateOfBirth">Date of Birth *</label>
+                            <input type="date" id="dateOfBirth" name="dateOfBirth" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="gender">Gender *</label>
+                            <select id="gender" name="gender" required>
+                                <option value="">Select your gender</option>
+                                <option value="man">Man</option>
+                                <option value="woman">Woman</option>
+                                <option value="nonbinary">Non-binary</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="sexualOrientation">Sexual Orientation * (Select all that apply)</label>
+                            <div class="multi-select-container">
+                                <div class="checkbox-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="sexualOrientation" value="man" id="orientation-man">
+                                        <span class="checkbox-text">Men</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="sexualOrientation" value="woman" id="orientation-woman">
+                                        <span class="checkbox-text">Women</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="sexualOrientation" value="nonbinary" id="orientation-nonbinary">
+                                        <span class="checkbox-text">Non-binary</span>
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                         <button type="button" class="next-button" data-next="2">Next</button>
                     </div>
@@ -238,8 +270,8 @@
                     <h1>About Viraat's Matchmaker</h1>
                     
                     <div class="about-intro">
-                        <p class="about-lead">Welcome to a different kind of matchmaking experience.</p>
-                        <p>In a world of algorithms and endless swiping, we believe there's something magical about human intuition and genuine connection.</p>
+                        <p class="about-lead">Seema aunty but better</p>
+                        <p>You trust me, Viraat, with your singleness. I won't let you down</p>
                     </div>
 
                     <div class="about-details">
@@ -249,31 +281,25 @@
                                 <div class="step-number">1</div>
                                 <div class="step-content">
                                     <h3>Submit Your Application</h3>
-                                    <p>Tell us about yourself through thoughtful questions that go beyond the surface. We want to know what makes you uniquely you.</p>
                                 </div>
                             </div>
                             <div class="about-step">
                                 <div class="step-number">2</div>
                                 <div class="step-content">
                                     <h3>Personal Review</h3>
-                                    <p>Viraat personally reviews every application, looking for authentic connections and compatibility based on values, personality, and life goals.</p>
+                                    <p>I'll personally review your application and see who is a good match for you</p>
                                 </div>
                             </div>
                             <div class="about-step">
                                 <div class="step-number">3</div>
                                 <div class="step-content">
                                     <h3>Thoughtful Matching</h3>
-                                    <p>When the right match is found, introductions are made with care and consideration. Quality over quantity, always.</p>
+                                    <p>You'll get an email with your perfect match two days after the application closes</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="about-philosophy">
-                        <h2>Our Philosophy</h2>
-                        <p>We believe that meaningful relationships start with understanding yourself and what you're truly looking for. This isn't about finding someone to complete you - it's about connecting two whole people who can grow together.</p>
-                        <p>Each week brings new applications and fresh opportunities for connection. Take your time, be honest, and trust the process.</p>
-                    </div>
 
                     <div class="about-cta">
                         <h2>Ready to Begin?</h2>

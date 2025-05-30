@@ -129,6 +129,9 @@ class SupabaseClient {
             const submission = {
                 full_name: applicationData.fullName,
                 email: applicationData.email,
+                date_of_birth: applicationData.dateOfBirth,
+                gender: applicationData.gender,
+                sexual_orientation: JSON.stringify(applicationData.sexualOrientation),
                 photo_url: photoUrl,
                 favorite_color: applicationData.favoriteColor,
                 location: applicationData.location,

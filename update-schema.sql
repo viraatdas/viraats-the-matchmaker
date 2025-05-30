@@ -3,6 +3,9 @@
 
 -- Add new columns to applications table
 ALTER TABLE applications 
+ADD COLUMN IF NOT EXISTS date_of_birth DATE,
+ADD COLUMN IF NOT EXISTS gender VARCHAR(20),
+ADD COLUMN IF NOT EXISTS sexual_orientation TEXT,
 ADD COLUMN IF NOT EXISTS favorite_color VARCHAR(100),
 ADD COLUMN IF NOT EXISTS location VARCHAR(50),
 ADD COLUMN IF NOT EXISTS are_you_happy TEXT,

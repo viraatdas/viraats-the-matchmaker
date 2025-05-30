@@ -291,7 +291,43 @@ function validateCurrentStep() {
                 }, 3000);
             }
         }
+        
+        // Special validation for date of birth (age verification)
+        if (field.type === 'date' && field.value.trim()) {
+            const birthDate = new Date(field.value);
+            const today = new Date();
+            const age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            
+            if (age < 18) {
+                isValid = false;
+                field.style.borderColor = '#ff6b6b';
+                showErrorModal('validation', 'Age Requirement', 'You must be 18 or older to apply.');
+                
+                setTimeout(() => {
+                    field.style.borderColor = '';
+                }, 3000);
+            }
+        }
     });
+    
+    // Special validation for sexual orientation checkboxes
+    if (currentStep === 1) {
+        const orientationCheckboxes = document.querySelectorAll('input[name="sexualOrientation"]:checked');
+        if (orientationCheckboxes.length === 0) {
+            isValid = false;
+            const multiSelectContainer = document.querySelector('.multi-select-container');
+            multiSelectContainer.style.borderColor = '#ff6b6b';
+            
+            setTimeout(() => {
+                multiSelectContainer.style.borderColor = '';
+            }, 3000);
+        }
+    }
     
     // Special validation for photo upload
     if (currentStep === 2) {
@@ -469,6 +505,7 @@ function showErrorModal(type, title, message) {
         'permission': '🔒',
         'duplicate': '⚠️',
         'photo': '📷',
+        'validation': '⚠️',
         'generic': '❌'
     };
     
@@ -643,9 +680,16 @@ function setActiveNavLink(activeLink) {
 
 // Form data collection and submission
 function collectFormData() {
+    // Collect sexual orientation checkboxes
+    const orientationCheckboxes = document.querySelectorAll('input[name="sexualOrientation"]:checked');
+    const sexualOrientation = Array.from(orientationCheckboxes).map(cb => cb.value);
+    
     applicationData = {
         fullName: document.getElementById('fullName').value,
         email: document.getElementById('email').value,
+        dateOfBirth: document.getElementById('dateOfBirth').value,
+        gender: document.getElementById('gender').value,
+        sexualOrientation: sexualOrientation,
         photo: photoInput.files[0],
         favoriteColor: document.getElementById('favoriteColor').value,
         location: document.getElementById('location').value,

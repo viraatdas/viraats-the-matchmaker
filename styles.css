@@ -419,6 +419,62 @@ body {
     color: #495057;
 }
 
+/* Multi-select checkboxes */
+.multi-select-container {
+    background: #f8f9fa;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    padding: 1rem;
+    transition: all 0.2s ease;
+}
+
+.multi-select-container:focus-within {
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+}
+
+.checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0.5rem;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.checkbox-label:hover {
+    background: rgba(0, 123, 255, 0.05);
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: auto;
+    margin-right: 0.75rem;
+    transform: scale(1.2);
+    accent-color: #007bff;
+}
+
+.checkbox-text {
+    color: #495057;
+    font-size: 0.95rem;
+}
+
+.checkbox-label:has(input:checked) {
+    background: rgba(0, 123, 255, 0.1);
+    border-radius: 4px;
+}
+
+.checkbox-label:has(input:checked) .checkbox-text {
+    color: #007bff;
+    font-weight: 600;
+}
+
 /* Photo Upload */
 .photo-upload-area {
     position: relative;
