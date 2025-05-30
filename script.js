@@ -1,6 +1,6 @@
 // Application state
 let currentStep = 1;
-const totalSteps = 4;
+const totalSteps = 6;
 let applicationData = {};
 let deadlinePassed = false;
 let currentWeekQuestions = null;
@@ -245,7 +245,7 @@ function goToStep(step) {
         updateProgress();
         
         // Update review section if on final step
-        if (step === 4) {
+        if (step === 6) {
             updateReviewSection();
         }
     }
@@ -308,6 +308,10 @@ function validateCurrentStep() {
 function updateReviewSection() {
     document.getElementById('review-name').textContent = document.getElementById('fullName').value;
     document.getElementById('review-email').textContent = document.getElementById('email').value;
+    
+    const locationSelect = document.getElementById('location');
+    const locationText = locationSelect.options[locationSelect.selectedIndex].text;
+    document.getElementById('review-location').textContent = locationText;
     
     if (photoInput.files && photoInput.files.length > 0) {
         document.getElementById('review-photo').textContent = `${photoInput.files[0].name} (${(photoInput.files[0].size / 1024 / 1024).toFixed(2)}MB)`;
@@ -515,15 +519,17 @@ function initializeTestimonials() {
 
 // Form data collection and submission
 function collectFormData() {
-    const question3Element = document.getElementById('question3');
-    
     applicationData = {
         fullName: document.getElementById('fullName').value,
         email: document.getElementById('email').value,
         photo: photoInput.files[0],
-        question1: document.getElementById('question1').value,
-        question2: document.getElementById('question2').value,
-        question3: question3Element ? question3Element.value : '',
+        favoriteColor: document.getElementById('favoriteColor').value,
+        location: document.getElementById('location').value,
+        areYouHappy: document.getElementById('areYouHappy').value,
+        greatestFear: document.getElementById('greatestFear').value,
+        funToBearound: document.getElementById('funToBearound').value,
+        lifeWithoutPartner: document.getElementById('lifeWithoutPartner').value,
+        lookingForHere: document.getElementById('lookingForHere').value,
         submittedAt: new Date().toISOString()
     };
 }
