@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Application Portal</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="admin-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="admin-container">
+        <header class="admin-header">
+            <h1>Application Portal Admin</h1>
+            <nav class="admin-nav">
+                <button class="nav-button active" data-section="dashboard">Dashboard</button>
+                <button class="nav-button" data-section="questions">Weekly Questions</button>
+                <button class="nav-button" data-section="applications">Applications</button>
+                <button class="nav-button" data-section="settings">Settings</button>
+            </nav>
+        </header>
+
+        <main class="admin-main">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="admin-section active">
+                <h2>Dashboard</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>This Week</h3>
+                        <div class="stat-value" id="thisWeekCount">-</div>
+                        <div class="stat-label">Applications</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>This Year</h3>
+                        <div class="stat-value" id="thisYearCount">-</div>
+                        <div class="stat-label">Total Applications</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Current Week</h3>
+                        <div class="stat-value" id="currentWeekNumber">-</div>
+                        <div class="stat-label">Week Number</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Time Left</h3>
+                        <div class="stat-value" id="timeLeft">-</div>
+                        <div class="stat-label">Until Deadline</div>
+                    </div>
+                </div>
+
+                <div class="recent-applications">
+                    <h3>Recent Applications</h3>
+                    <div class="table-container">
+                        <table id="recentApplicationsTable">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Week</th>
+                                    <th>Submitted</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Weekly Questions Section -->
+            <section id="questions" class="admin-section">
+                <h2>Weekly Questions Management</h2>
+                
+                <div class="current-questions">
+                    <h3>Current Week Questions</h3>
+                    <div class="questions-display" id="currentQuestionsDisplay">
+                        Loading...
+                    </div>
+                </div>
+
+                <div class="question-form">
+                    <h3>Create/Update Weekly Questions</h3>
+                    <form id="questionsForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="weekNumber">Week Number</label>
+                                <input type="number" id="weekNumber" min="1" max="53" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="year">Year</label>
+                                <input type="number" id="year" min="2024" value="2025" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="adminQuestion1">Question 1</label>
+                            <textarea id="adminQuestion1" rows="3" required placeholder="Enter the first question..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="adminQuestion2">Question 2</label>
+                            <textarea id="adminQuestion2" rows="3" required placeholder="Enter the second question..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="adminQuestion3">Question 3 (Optional)</label>
+                            <textarea id="adminQuestion3" rows="3" placeholder="Enter the third question (optional)..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="deadline">Deadline</label>
+                            <input type="datetime-local" id="deadline" required>
+                        </div>
+
+                        <button type="submit" class="submit-button">Save Questions</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Applications Section -->
+            <section id="applications" class="admin-section">
+                <h2>Applications Management</h2>
+                
+                <div class="filter-controls">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="filterWeek">Week</label>
+                            <select id="filterWeek">
+                                <option value="">All Weeks</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="filterYear">Year</label>
+                            <select id="filterYear">
+                                <option value="">All Years</option>
+                            </select>
+                        </div>
+                        <button type="button" class="filter-button" id="applyFilters">Apply Filters</button>
+                        <button type="button" class="export-button" id="exportApplications">Export CSV</button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table id="applicationsTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Week</th>
+                                <th>Year</th>
+                                <th>Submitted</th>
+                                <th>Photo</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings" class="admin-section">
+                <h2>Settings</h2>
+                
+                <div class="settings-form">
+                    <h3>Supabase Configuration</h3>
+                    <div class="form-group">
+                        <label for="supabaseUrl">Supabase URL</label>
+                        <input type="url" id="supabaseUrl" placeholder="https://your-project.supabase.co">
+                    </div>
+                    <div class="form-group">
+                        <label for="supabaseKey">Supabase Anon Key</label>
+                        <input type="text" id="supabaseKey" placeholder="Your anon key">
+                    </div>
+                    <button type="button" class="submit-button" id="testConnection">Test Connection</button>
+                </div>
+
+                <div class="danger-zone">
+                    <h3>Danger Zone</h3>
+                    <p>These actions cannot be undone.</p>
+                    <button type="button" class="danger-button" id="clearAllData">Clear All Application Data</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Application Detail Modal -->
+    <div id="applicationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Application Details</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body" id="applicationDetails">
+                <!-- Application details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="supabase.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>
