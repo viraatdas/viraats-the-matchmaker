@@ -142,6 +142,24 @@
         </div>
     </div>
 
+    <!-- Error Modal -->
+    <div id="errorModal" class="error-modal">
+        <div class="error-modal-content">
+            <div class="error-modal-header">
+                <span class="error-icon" id="errorIcon">❌</span>
+                <h3 id="errorTitle">Error</h3>
+                <span class="error-close" id="errorClose">&times;</span>
+            </div>
+            <div class="error-modal-body">
+                <p id="errorMessage">Something went wrong.</p>
+                <div class="error-actions">
+                    <button class="error-button primary" id="errorRetry">Try Again</button>
+                    <button class="error-button secondary" id="errorDismiss">Dismiss</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="config.js"></script>
     <script src="supabase.js"></script>
     <script src="script.js"></script>

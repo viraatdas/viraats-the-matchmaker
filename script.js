@@ -20,6 +20,15 @@ const photoUploadArea = document.getElementById('photo-upload-area');
 const photoInput = document.getElementById('photo');
 const photoPreview = document.getElementById('photo-preview');
 
+// Error modal elements
+const errorModal = document.getElementById('errorModal');
+const errorIcon = document.getElementById('errorIcon');
+const errorTitle = document.getElementById('errorTitle');
+const errorMessage = document.getElementById('errorMessage');
+const errorClose = document.getElementById('errorClose');
+const errorRetry = document.getElementById('errorRetry');
+const errorDismiss = document.getElementById('errorDismiss');
+
 // Initialize the application
 document.addEventListener('DOMContentLoaded', async function() {
     await initializeApp();
@@ -45,6 +54,7 @@ async function initializeApp() {
         initializeCountdown();
         initializeForm();
         initializePhotoUpload();
+        initializeErrorModal();
         
         // Update form with current week's questions
         updateFormQuestions();
@@ -59,6 +69,7 @@ async function initializeApp() {
         initializeCountdown();
         initializeForm();
         initializePhotoUpload();
+        initializeErrorModal();
         totalStepsElement.textContent = totalSteps;
     }
 }
@@ -370,6 +381,64 @@ function showPhotoPreview(file) {
     reader.readAsDataURL(file);
 }
 
+// Error Modal functionality
+function initializeErrorModal() {
+    // Close modal events
+    errorClose.addEventListener('click', hideErrorModal);
+    errorDismiss.addEventListener('click', hideErrorModal);
+    
+    // Close on backdrop click
+    errorModal.addEventListener('click', (e) => {
+        if (e.target === errorModal) {
+            hideErrorModal();
+        }
+    });
+    
+    // Retry button will re-submit the form
+    errorRetry.addEventListener('click', () => {
+        hideErrorModal();
+        if (validateCurrentStep()) {
+            collectFormData();
+            submitApplication();
+        }
+    });
+    
+    // Escape key to close
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && errorModal.classList.contains('show')) {
+            hideErrorModal();
+        }
+    });
+}
+
+function showErrorModal(type, title, message) {
+    // Set icon based on type
+    const icons = {
+        'connection': '🔌',
+        'network': '🌐', 
+        'auth': '🔑',
+        'permission': '🔒',
+        'duplicate': '⚠️',
+        'photo': '📷',
+        'generic': '❌'
+    };
+    
+    errorIcon.textContent = icons[type] || icons.generic;
+    errorTitle.textContent = title;
+    errorMessage.textContent = message;
+    
+    errorModal.classList.add('show');
+    
+    // Focus trap
+    setTimeout(() => {
+        errorRetry.focus();
+    }, 100);
+}
+
+function hideErrorModal() {
+    errorModal.classList.remove('show');
+}
+
 // Form data collection and submission
 function collectFormData() {
     const question3Element = document.getElementById('question3');
@@ -414,7 +483,7 @@ async function submitApplication() {
         const existingApplication = await supabaseClient.checkExistingApplication(applicationData.email);
         
         if (existingApplication.exists) {
-            alert('You have already submitted an application for this week. Only one application per week is allowed.');
+            showErrorModal('duplicate', 'Duplicate Application', 'You have already submitted an application for this week. Only one application per week is allowed.');
             submitButton.disabled = false;
             submitButton.textContent = 'Submit Application';
             return;
@@ -426,7 +495,6 @@ async function submitApplication() {
         
         if (result.success) {
             console.log('Application submitted successfully:', result.data);
-            alert('Application submitted successfully! Thank you for applying.');
             showPage('success');
             resetForm();
         } else {
@@ -436,25 +504,39 @@ async function submitApplication() {
     } catch (error) {
         console.error('Error submitting application:', error);
         
-        let errorMessage = '';
+        let type, title, message;
         
         if (error.message.includes('Database connection failed')) {
-            errorMessage = '🔌 Database Connection Error\n\nThe application database is not properly configured. This is a technical issue on our end.\n\nPlease contact the administrator to fix the database setup.';
+            type = 'connection';
+            title = 'Database Connection Error';
+            message = 'The application database is not properly configured. This is a technical issue on our end. Please contact the administrator to fix the database setup.';
         } else if (error.message.includes('Failed to fetch')) {
-            errorMessage = '🌐 Network Error\n\nCannot connect to the server. Please check your internet connection and try again.';
+            type = 'network';
+            title = 'Network Error';
+            message = 'Cannot connect to the server. Please check your internet connection and try again.';
         } else if (error.message.includes('JWT')) {
-            errorMessage = '🔑 Authentication Error\n\nThere was an authentication issue with the database. Please try refreshing the page and submitting again.';
+            type = 'auth';
+            title = 'Authentication Error';
+            message = 'There was an authentication issue with the database. Please try refreshing the page and submitting again.';
         } else if (error.message.includes('permission denied') || error.message.includes('RLS')) {
-            errorMessage = '🔒 Permission Error\n\nThe database security settings are preventing your submission. Please contact the administrator to fix the database permissions.';
+            type = 'permission';
+            title = 'Permission Error';
+            message = 'The database security settings are preventing your submission. Please contact the administrator to fix the database permissions.';
         } else if (error.message.includes('violates') || error.message.includes('constraint')) {
-            errorMessage = '⚠️ Duplicate Application\n\nIt looks like you may have already submitted an application this week. Only one application per week is allowed.';
+            type = 'duplicate';
+            title = 'Duplicate Application';
+            message = 'It looks like you may have already submitted an application this week. Only one application per week is allowed.';
         } else if (error.message.includes('storage') || error.message.includes('photo')) {
-            errorMessage = '📷 Photo Upload Error\n\nThere was an issue uploading your photo. Try with a smaller image (under 5MB) or submit without a photo for now.';
+            type = 'photo';
+            title = 'Photo Upload Error';
+            message = 'There was an issue uploading your photo. Try with a smaller image (under 5MB) or submit without a photo for now.';
         } else {
-            errorMessage = `❌ Submission Error\n\nSomething went wrong while submitting your application.\n\nError details: ${error.message}\n\nPlease try again or contact support if this continues.`;
+            type = 'generic';
+            title = 'Submission Error';
+            message = `Something went wrong while submitting your application. Error details: ${error.message}. Please try again or contact support if this continues.`;
         }
         
-        alert(errorMessage);
+        showErrorModal(type, title, message);
         console.error('Full error details:', error);
         
         submitButton.disabled = false;
