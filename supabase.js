@@ -12,6 +12,9 @@ class SupabaseClient {
             // Import Supabase from CDN
             if (typeof window !== 'undefined') {
                 // Browser environment
+                if (typeof supabase === 'undefined') {
+                    throw new Error('Supabase CDN not loaded');
+                }
                 const { createClient } = supabase;
                 this.supabase = createClient(
                     SUPABASE_CONFIG.url,
@@ -25,10 +28,36 @@ class SupabaseClient {
                     SUPABASE_CONFIG.anonKey
                 );
             }
+            
+            // Test connection
+            console.log('Testing Supabase connection...');
+            await this.testConnection();
+            
             this.initialized = true;
+            console.log('Supabase initialized successfully');
         } catch (error) {
             console.error('Failed to initialize Supabase:', error);
             throw error;
+        }
+    }
+
+    // Test connection method
+    async testConnection() {
+        try {
+            const { data, error } = await this.supabase
+                .from('applications')
+                .select('count')
+                .limit(1);
+            
+            if (error && error.code !== 'PGRST116') {
+                throw error;
+            }
+            
+            console.log('Supabase connection test successful');
+            return true;
+        } catch (error) {
+            console.error('Supabase connection test failed:', error);
+            throw new Error('Database connection failed. Please check if the schema has been run.');
         }
     }
 

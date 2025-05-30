@@ -383,7 +383,20 @@ async function submitApplication() {
     submitButton.textContent = 'Submitting...';
     
     try {
+        console.log('Starting application submission...');
+        console.log('Application data:', {
+            ...applicationData,
+            photo: applicationData.photo ? `${applicationData.photo.name} (${applicationData.photo.size} bytes)` : 'No photo'
+        });
+        
+        // Initialize Supabase if not already done
+        if (!supabaseClient.initialized) {
+            console.log('Initializing Supabase client...');
+            await supabaseClient.init();
+        }
+        
         // Check if user has already applied this week
+        console.log('Checking for existing application...');
         const existingApplication = await supabaseClient.checkExistingApplication(applicationData.email);
         
         if (existingApplication.exists) {
@@ -394,10 +407,12 @@ async function submitApplication() {
         }
         
         // Submit application to Supabase
+        console.log('Submitting application to Supabase...');
         const result = await supabaseClient.submitApplication(applicationData);
         
         if (result.success) {
             console.log('Application submitted successfully:', result.data);
+            alert('Application submitted successfully! Thank you for applying.');
             showPage('success');
             resetForm();
         } else {
@@ -406,7 +421,20 @@ async function submitApplication() {
         
     } catch (error) {
         console.error('Error submitting application:', error);
-        alert('There was an error submitting your application. Please try again.');
+        
+        let errorMessage = 'There was an error submitting your application. ';
+        
+        if (error.message.includes('Database connection failed')) {
+            errorMessage += 'Please contact support - database not properly configured.';
+        } else if (error.message.includes('Failed to fetch')) {
+            errorMessage += 'Please check your internet connection and try again.';
+        } else {
+            errorMessage += 'Please try again or contact support if the problem persists.';
+        }
+        
+        alert(errorMessage);
+        console.error('Full error details:', error);
+        
         submitButton.disabled = false;
         submitButton.textContent = 'Submit Application';
     }
