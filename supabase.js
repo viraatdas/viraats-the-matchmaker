@@ -103,13 +103,26 @@ class SupabaseClient {
         await this.init();
         
         try {
+            console.log('Starting application submission process...');
             const currentWeek = getCurrentWeek();
             const currentYear = new Date().getFullYear();
+            
+            console.log(`Current week: ${currentWeek}, Current year: ${currentYear}`);
             
             // Upload photo to Supabase Storage
             let photoUrl = null;
             if (applicationData.photo) {
-                photoUrl = await this.uploadPhoto(applicationData.photo);
+                console.log('Uploading photo...');
+                try {
+                    photoUrl = await this.uploadPhoto(applicationData.photo);
+                    console.log('Photo uploaded successfully:', photoUrl);
+                } catch (photoError) {
+                    console.error('Photo upload failed:', photoError);
+                    // Continue without photo for now
+                    photoUrl = null;
+                }
+            } else {
+                console.log('No photo to upload');
             }
 
             // Prepare application data
@@ -126,18 +139,32 @@ class SupabaseClient {
                 ip_address: await this.getClientIP()
             };
 
+            console.log('Prepared submission data:', {
+                ...submission,
+                photo_url: submission.photo_url ? 'Photo URL set' : 'No photo'
+            });
+
+            console.log('Inserting into applications table...');
             const { data, error } = await this.supabase
                 .from('applications')
                 .insert(submission)
                 .select();
 
             if (error) {
+                console.error('Database insert error:', error);
                 throw error;
             }
 
+            console.log('Application submitted successfully to database:', data);
             return { success: true, data: data[0] };
         } catch (error) {
             console.error('Error submitting application:', error);
+            console.error('Error details:', {
+                message: error.message,
+                code: error.code,
+                details: error.details,
+                hint: error.hint
+            });
             return { success: false, error: error.message };
         }
     }
@@ -147,9 +174,19 @@ class SupabaseClient {
         await this.init();
         
         try {
+            console.log('Preparing photo upload...', {
+                name: photoFile.name,
+                size: photoFile.size,
+                type: photoFile.type
+            });
+            
             const fileExt = photoFile.name.split('.').pop();
             const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
-            const filePath = `photos/${getCurrentWeek()}/${fileName}`;
+            const currentWeek = getCurrentWeek();
+            const currentYear = new Date().getFullYear();
+            const filePath = `${currentYear}/week-${currentWeek}/${fileName}`;
+
+            console.log('Uploading to path:', filePath);
 
             const { data, error } = await this.supabase.storage
                 .from('application-photos')
@@ -159,17 +196,26 @@ class SupabaseClient {
                 });
 
             if (error) {
+                console.error('Storage upload error:', error);
                 throw error;
             }
+
+            console.log('Photo uploaded to storage:', data);
 
             // Get public URL
             const { data: { publicUrl } } = this.supabase.storage
                 .from('application-photos')
                 .getPublicUrl(filePath);
 
+            console.log('Generated public URL:', publicUrl);
             return publicUrl;
         } catch (error) {
             console.error('Error uploading photo:', error);
+            console.error('Photo upload error details:', {
+                message: error.message,
+                statusCode: error.statusCode,
+                error: error.error
+            });
             throw error;
         }
     }

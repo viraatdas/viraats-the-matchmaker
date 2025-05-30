@@ -28,6 +28,12 @@ document.addEventListener('DOMContentLoaded', async function() {
 // Main initialization function
 async function initializeApp() {
     try {
+        console.log('Initializing application...');
+        console.log('Supabase config:', {
+            url: SUPABASE_CONFIG.url,
+            hasKey: !!SUPABASE_CONFIG.anonKey
+        });
+        
         // Load current week's questions and deadline from Supabase
         await loadWeeklyQuestions();
         
@@ -42,6 +48,8 @@ async function initializeApp() {
         
         // Update form with current week's questions
         updateFormQuestions();
+        
+        console.log('Application initialized successfully');
         
     } catch (error) {
         console.error('Failed to initialize app:', error);
@@ -392,7 +400,13 @@ async function submitApplication() {
         // Initialize Supabase if not already done
         if (!supabaseClient.initialized) {
             console.log('Initializing Supabase client...');
-            await supabaseClient.init();
+            try {
+                await supabaseClient.init();
+                console.log('Supabase client initialized successfully');
+            } catch (initError) {
+                console.error('Failed to initialize Supabase:', initError);
+                throw new Error('Database connection failed: ' + initError.message);
+            }
         }
         
         // Check if user has already applied this week
