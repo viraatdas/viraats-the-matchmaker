@@ -436,14 +436,22 @@ async function submitApplication() {
     } catch (error) {
         console.error('Error submitting application:', error);
         
-        let errorMessage = 'There was an error submitting your application. ';
+        let errorMessage = '';
         
         if (error.message.includes('Database connection failed')) {
-            errorMessage += 'Please contact support - database not properly configured.';
+            errorMessage = '🔌 Database Connection Error\n\nThe application database is not properly configured. This is a technical issue on our end.\n\nPlease contact the administrator to fix the database setup.';
         } else if (error.message.includes('Failed to fetch')) {
-            errorMessage += 'Please check your internet connection and try again.';
+            errorMessage = '🌐 Network Error\n\nCannot connect to the server. Please check your internet connection and try again.';
+        } else if (error.message.includes('JWT')) {
+            errorMessage = '🔑 Authentication Error\n\nThere was an authentication issue with the database. Please try refreshing the page and submitting again.';
+        } else if (error.message.includes('permission denied') || error.message.includes('RLS')) {
+            errorMessage = '🔒 Permission Error\n\nThe database security settings are preventing your submission. Please contact the administrator to fix the database permissions.';
+        } else if (error.message.includes('violates') || error.message.includes('constraint')) {
+            errorMessage = '⚠️ Duplicate Application\n\nIt looks like you may have already submitted an application this week. Only one application per week is allowed.';
+        } else if (error.message.includes('storage') || error.message.includes('photo')) {
+            errorMessage = '📷 Photo Upload Error\n\nThere was an issue uploading your photo. Try with a smaller image (under 5MB) or submit without a photo for now.';
         } else {
-            errorMessage += 'Please try again or contact support if the problem persists.';
+            errorMessage = `❌ Submission Error\n\nSomething went wrong while submitting your application.\n\nError details: ${error.message}\n\nPlease try again or contact support if this continues.`;
         }
         
         alert(errorMessage);
