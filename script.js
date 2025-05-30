@@ -55,6 +55,7 @@ async function initializeApp() {
         initializeForm();
         initializePhotoUpload();
         initializeErrorModal();
+        initializeTestimonials();
         
         // Update form with current week's questions
         updateFormQuestions();
@@ -70,6 +71,7 @@ async function initializeApp() {
         initializeForm();
         initializePhotoUpload();
         initializeErrorModal();
+        initializeTestimonials();
         totalStepsElement.textContent = totalSteps;
     }
 }
@@ -437,6 +439,78 @@ function showErrorModal(type, title, message) {
 
 function hideErrorModal() {
     errorModal.classList.remove('show');
+}
+
+// Testimonials functionality
+function initializeTestimonials() {
+    const testimonials = document.querySelectorAll('.testimonial');
+    const dots = document.querySelectorAll('.dot');
+    let currentTestimonial = 0;
+    let testimonialInterval;
+
+    function showTestimonial(index) {
+        // Hide all testimonials
+        testimonials.forEach((testimonial, i) => {
+            testimonial.classList.remove('active');
+            if (i === currentTestimonial && i !== index) {
+                testimonial.classList.add('slide-out-left');
+            }
+        });
+
+        // Remove all dot active states
+        dots.forEach(dot => dot.classList.remove('active'));
+
+        // Show the selected testimonial
+        setTimeout(() => {
+            testimonials[index].classList.remove('slide-out-left', 'slide-in-right');
+            testimonials[index].classList.add('active');
+            dots[index].classList.add('active');
+            currentTestimonial = index;
+        }, 150);
+    }
+
+    function nextTestimonial() {
+        const next = (currentTestimonial + 1) % testimonials.length;
+        showTestimonial(next);
+    }
+
+    function startAutoplay() {
+        testimonialInterval = setInterval(nextTestimonial, 4000); // Change every 4 seconds
+    }
+
+    function stopAutoplay() {
+        if (testimonialInterval) {
+            clearInterval(testimonialInterval);
+        }
+    }
+
+    // Dot click handlers
+    dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+            stopAutoplay();
+            showTestimonial(index);
+            startAutoplay();
+        });
+    });
+
+    // Pause on hover
+    const testimonialContainer = document.querySelector('.testimonials-container');
+    if (testimonialContainer) {
+        testimonialContainer.addEventListener('mouseenter', stopAutoplay);
+        testimonialContainer.addEventListener('mouseleave', startAutoplay);
+    }
+
+    // Start autoplay
+    startAutoplay();
+
+    // Clean up on page visibility change
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            stopAutoplay();
+        } else {
+            startAutoplay();
+        }
+    });
 }
 
 // Form data collection and submission
