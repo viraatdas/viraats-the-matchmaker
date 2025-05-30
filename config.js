@@ -1,7 +1,7 @@
 // Supabase configuration
 const SUPABASE_CONFIG = {
-    url: process.env.SUPABASE_URL || 'https://sduqpihjmpvdhdcubwsa.supabase.co',
-    anonKey: process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNkdXFwaWhqbXB2ZGhkY3Vid3NhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg1Njg3NDEsImV4cCI6MjA2NDE0NDc0MX0.QR9xOAghbG517sVUaX2fGkUXfwfYgKHu4_JGIVh7BZ8'
+    url: 'https://sduqpihjmpvdhdcubwsa.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNkdXFwaWhqbXB2ZGhkY3Vid3NhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg1Njg3NDEsImV4cCI6MjA2NDE0NDc0MX0.QR9xOAghbG517sVUaX2fGkUXfwfYgKHu4_JGIVh7BZ8'
 };
 
 // Week calculation helper
