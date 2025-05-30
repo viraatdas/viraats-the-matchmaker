@@ -11,6 +11,54 @@ body {
     min-height: 100vh;
     overflow-x: hidden;
     line-height: 1.6;
+    padding-top: 80px;
+}
+
+/* Navigation */
+.main-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    z-index: 1000;
+    padding: 1rem 0;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-logo {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+.nav-links {
+    display: flex;
+    gap: 2rem;
+}
+
+.nav-link {
+    color: #6c757d;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+    padding: 0.5rem 0;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    color: #007bff;
 }
 
 .container {
@@ -246,6 +294,21 @@ body {
     margin-bottom: 1rem;
     color: #1a1a1a;
     font-weight: 600;
+}
+
+.application-note {
+    background: #e7f3ff;
+    border: 1px solid #b3d9ff;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.application-note p {
+    margin: 0;
+    color: #2c5282;
+    font-size: 0.95rem;
+    line-height: 1.5;
 }
 
 .progress-bar {
@@ -662,8 +725,153 @@ body {
     }
 }
 
+/* About Page */
+.about-section {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.about-content {
+    background: white;
+    border-radius: 12px;
+    padding: 3rem;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.about-content h1 {
+    font-size: 2.5rem;
+    color: #1a1a1a;
+    margin-bottom: 2rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+.about-intro {
+    margin-bottom: 3rem;
+    text-align: center;
+}
+
+.about-lead {
+    font-size: 1.25rem;
+    color: #495057;
+    font-weight: 500;
+    margin-bottom: 1rem;
+}
+
+.about-details,
+.about-philosophy,
+.about-cta {
+    margin-bottom: 3rem;
+}
+
+.about-content h2 {
+    font-size: 1.5rem;
+    color: #1a1a1a;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+.about-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.about-step {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+}
+
+.step-number {
+    background: #007bff;
+    color: white;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.step-content h3 {
+    font-size: 1.125rem;
+    color: #1a1a1a;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.step-content p {
+    color: #495057;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.about-philosophy {
+    background: #f8f9fa;
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+}
+
+.about-cta {
+    text-align: center;
+    background: linear-gradient(135deg, #e7f3ff 0%, #f0f8ff 100%);
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid #b3d9ff;
+}
+
+.about-cta h2 {
+    color: #1a1a1a;
+    margin-bottom: 1rem;
+}
+
+.about-cta p {
+    color: #495057;
+    margin-bottom: 1.5rem;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
+    body {
+        padding-top: 70px;
+    }
+    
+    .nav-container {
+        padding: 0 1rem;
+    }
+    
+    .nav-logo {
+        font-size: 1.25rem;
+    }
+    
+    .nav-links {
+        gap: 1rem;
+    }
+    
+    .nav-link {
+        font-size: 0.9rem;
+    }
+    
+    .about-content {
+        padding: 2rem;
+    }
+    
+    .about-content h1 {
+        font-size: 2rem;
+    }
+    
+    .about-step {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+    
     .page {
         padding: 1rem;
     }

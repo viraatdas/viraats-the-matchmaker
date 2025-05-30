@@ -11,6 +11,7 @@ const landingPage = document.getElementById('landing-page');
 const applicationPage = document.getElementById('application-page');
 const closedPage = document.getElementById('closed-page');
 const successPage = document.getElementById('success-page');
+const aboutPage = document.getElementById('about-page');
 const startButton = document.getElementById('start-application');
 const applicationForm = document.getElementById('application-form');
 const progressFill = document.getElementById('progress-fill');
@@ -19,6 +20,11 @@ const totalStepsElement = document.getElementById('total-steps');
 const photoUploadArea = document.getElementById('photo-upload-area');
 const photoInput = document.getElementById('photo');
 const photoPreview = document.getElementById('photo-preview');
+
+// Navigation elements
+const navHome = document.getElementById('nav-home');
+const navAbout = document.getElementById('nav-about');
+const aboutApplyButton = document.getElementById('about-apply-button');
 
 // Error modal elements
 const errorModal = document.getElementById('errorModal');
@@ -56,6 +62,7 @@ async function initializeApp() {
         initializePhotoUpload();
         initializeErrorModal();
         initializeTestimonials();
+        initializeNavigation();
         
         // Update form with current week's questions
         updateFormQuestions();
@@ -72,6 +79,7 @@ async function initializeApp() {
         initializePhotoUpload();
         initializeErrorModal();
         initializeTestimonials();
+        initializeNavigation();
         totalStepsElement.textContent = totalSteps;
     }
 }
@@ -167,24 +175,13 @@ function checkDeadline() {
     }
 }
 
-// Page navigation
+// Page navigation (updated to work with new navigation system)
 function showPage(pageName) {
-    const pages = document.querySelectorAll('.page');
-    pages.forEach(page => page.classList.remove('active'));
+    showMainPage(pageName);
     
-    switch(pageName) {
-        case 'landing':
-            landingPage.classList.add('active');
-            break;
-        case 'application':
-            applicationPage.classList.add('active');
-            break;
-        case 'closed':
-            closedPage.classList.add('active');
-            break;
-        case 'success':
-            successPage.classList.add('active');
-            break;
+    // Update navigation based on page
+    if (pageName === 'landing' || pageName === 'application' || pageName === 'closed' || pageName === 'success') {
+        setActiveNavLink('home');
     }
 }
 
@@ -201,9 +198,15 @@ function initializeForm() {
     
     // Navigation buttons
     document.querySelectorAll('.next-button').forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', async function() {
             const nextStep = parseInt(this.dataset.next);
-            if (validateCurrentStep()) {
+            
+            // Check for duplicate application when moving from step 1 to 2
+            if (currentStep === 1 && nextStep === 2) {
+                if (await validateStepWithDuplicateCheck()) {
+                    goToStep(nextStep);
+                }
+            } else if (validateCurrentStep()) {
                 goToStep(nextStep);
             }
         });
@@ -303,6 +306,46 @@ function validateCurrentStep() {
     }
     
     return isValid;
+}
+
+// Enhanced validation with duplicate checking for step 1
+async function validateStepWithDuplicateCheck() {
+    // First do standard validation
+    if (!validateCurrentStep()) {
+        return false;
+    }
+    
+    const email = document.getElementById('email').value.trim();
+    if (!email) {
+        return false;
+    }
+    
+    try {
+        // Initialize Supabase if needed
+        if (!supabaseClient.initialized) {
+            await supabaseClient.init();
+        }
+        
+        // Check for existing application
+        console.log('Checking for duplicate application for email:', email);
+        const existingApplication = await supabaseClient.checkExistingApplication(email);
+        
+        if (existingApplication.exists) {
+            const submissionDate = new Date(existingApplication.submission.submitted_at).toLocaleDateString();
+            showErrorModal(
+                'duplicate',
+                'Application Already Submitted',
+                `You have already submitted an application for this week on ${submissionDate}. Only one application per week is allowed. Please wait until next week to submit a new application.`
+            );
+            return false;
+        }
+        
+        return true;
+    } catch (error) {
+        console.error('Error checking for duplicate application:', error);
+        // Allow them to continue if there's an error checking
+        return true;
+    }
 }
 
 function updateReviewSection() {
@@ -515,6 +558,87 @@ function initializeTestimonials() {
             startAutoplay();
         }
     });
+}
+
+// Navigation functionality
+function initializeNavigation() {
+    // Home navigation
+    navHome.addEventListener('click', (e) => {
+        e.preventDefault();
+        showMainPage('landing');
+        setActiveNavLink('home');
+    });
+    
+    // About navigation
+    navAbout.addEventListener('click', (e) => {
+        e.preventDefault();
+        showMainPage('about');
+        setActiveNavLink('about');
+    });
+    
+    // About page apply button
+    if (aboutApplyButton) {
+        aboutApplyButton.addEventListener('click', () => {
+            if (deadlinePassed) {
+                showPage('closed');
+                return;
+            }
+            showMainPage('landing');
+            setActiveNavLink('home');
+            // Scroll to application section
+            setTimeout(() => {
+                const heroSection = document.querySelector('.hero-section');
+                if (heroSection) {
+                    heroSection.scrollIntoView({ behavior: 'smooth' });
+                }
+            }, 100);
+        });
+    }
+}
+
+function showMainPage(pageName) {
+    // Hide all main pages
+    const pages = [landingPage, aboutPage, applicationPage, closedPage, successPage];
+    pages.forEach(page => {
+        if (page) page.classList.remove('active');
+    });
+    
+    // Show requested page
+    switch(pageName) {
+        case 'landing':
+            if (landingPage) landingPage.classList.add('active');
+            break;
+        case 'about':
+            if (aboutPage) aboutPage.classList.add('active');
+            break;
+        case 'application':
+            if (applicationPage) applicationPage.classList.add('active');
+            break;
+        case 'closed':
+            if (closedPage) closedPage.classList.add('active');
+            break;
+        case 'success':
+            if (successPage) successPage.classList.add('active');
+            break;
+    }
+}
+
+function setActiveNavLink(activeLink) {
+    // Remove active class from all nav links
+    const navLinks = [navHome, navAbout];
+    navLinks.forEach(link => {
+        if (link) link.classList.remove('active');
+    });
+    
+    // Add active class to the specified link
+    switch(activeLink) {
+        case 'home':
+            if (navHome) navHome.classList.add('active');
+            break;
+        case 'about':
+            if (navAbout) navAbout.classList.add('active');
+            break;
+    }
 }
 
 // Form data collection and submission
