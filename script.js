@@ -680,26 +680,42 @@ function setActiveNavLink(activeLink) {
 
 // Form data collection and submission
 function collectFormData() {
-    // Collect sexual orientation checkboxes
-    const orientationCheckboxes = document.querySelectorAll('input[name="sexualOrientation"]:checked');
-    const sexualOrientation = Array.from(orientationCheckboxes).map(cb => cb.value);
-    
+    // Start with essential fields
     applicationData = {
         fullName: document.getElementById('fullName').value,
         email: document.getElementById('email').value,
-        dateOfBirth: document.getElementById('dateOfBirth').value,
-        gender: document.getElementById('gender').value,
-        sexualOrientation: sexualOrientation,
         photo: photoInput.files[0],
-        favoriteColor: document.getElementById('favoriteColor').value,
-        location: document.getElementById('location').value,
-        areYouHappy: document.getElementById('areYouHappy').value,
-        greatestFear: document.getElementById('greatestFear').value,
-        funToBearound: document.getElementById('funToBearound').value,
-        lifeWithoutPartner: document.getElementById('lifeWithoutPartner').value,
-        lookingForHere: document.getElementById('lookingForHere').value,
         submittedAt: new Date().toISOString()
     };
+    
+    // Dynamically collect all form inputs (flexible approach)
+    const form = document.getElementById('application-form');
+    const formElements = form.querySelectorAll('input, select, textarea');
+    
+    formElements.forEach(element => {
+        if (element.name && element.name !== 'photo') {
+            if (element.type === 'checkbox') {
+                // Handle checkboxes (collect all checked values for same name)
+                const checkboxes = form.querySelectorAll(`input[name="${element.name}"]:checked`);
+                const values = Array.from(checkboxes).map(cb => cb.value);
+                if (values.length > 0) {
+                    applicationData[element.name] = values;
+                }
+            } else if (element.type === 'radio') {
+                // Handle radio buttons
+                if (element.checked) {
+                    applicationData[element.name] = element.value;
+                }
+            } else {
+                // Handle regular inputs, selects, textareas
+                if (element.value.trim()) {
+                    applicationData[element.name] = element.value;
+                }
+            }
+        }
+    });
+    
+    console.log('Collected form data:', applicationData);
 }
 
 async function submitApplication() {

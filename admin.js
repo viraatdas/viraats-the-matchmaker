@@ -313,8 +313,16 @@ async function viewApplication(applicationId) {
             return;
         }
         
+        // Parse form responses from JSON
+        let formResponses = {};
+        try {
+            formResponses = application.form_responses ? JSON.parse(application.form_responses) : {};
+        } catch (e) {
+            console.error('Error parsing form responses:', e);
+        }
+        
         const modalBody = document.getElementById('applicationDetails');
-        modalBody.innerHTML = `
+        let html = `
             <div class="detail-item">
                 <span class="detail-label">Full Name:</span>
                 <span class="detail-value">${application.full_name}</span>
@@ -339,25 +347,48 @@ async function viewApplication(applicationId) {
                 </div>
             </div>
             ` : ''}
-            <div class="detail-item">
-                <span class="detail-label">Answer 1:</span>
-                <div class="detail-value">${application.question1_answer}</div>
-            </div>
-            <div class="detail-item">
-                <span class="detail-label">Answer 2:</span>
-                <div class="detail-value">${application.question2_answer}</div>
-            </div>
-            ${application.question3_answer ? `
-            <div class="detail-item">
-                <span class="detail-label">Answer 3:</span>
-                <div class="detail-value">${application.question3_answer}</div>
-            </div>
-            ` : ''}
+        `;
+        
+        // Dynamically add all form responses
+        Object.entries(formResponses).forEach(([key, value]) => {
+            let displayValue = value;
+            
+            // Format arrays (like sexual orientation)
+            if (Array.isArray(value)) {
+                displayValue = value.join(', ');
+            }
+            
+            // Format dates
+            if (key.toLowerCase().includes('date') || key === 'dateOfBirth') {
+                try {
+                    displayValue = new Date(value).toLocaleDateString();
+                } catch (e) {
+                    // Keep original value if date parsing fails
+                }
+            }
+            
+            // Convert camelCase to readable format
+            const readableKey = key
+                .replace(/([A-Z])/g, ' $1')
+                .replace(/^./, str => str.toUpperCase())
+                .replace(/([a-z])([A-Z])/g, '$1 $2');
+            
+            html += `
+                <div class="detail-item">
+                    <span class="detail-label">${readableKey}:</span>
+                    <div class="detail-value">${displayValue}</div>
+                </div>
+            `;
+        });
+        
+        html += `
             <div class="detail-item">
                 <span class="detail-label">IP Address:</span>
                 <span class="detail-value">${application.ip_address || 'Unknown'}</span>
             </div>
         `;
+        
+        modalBody.innerHTML = html;
         
         applicationModal.style.display = 'block';
     } catch (error) {

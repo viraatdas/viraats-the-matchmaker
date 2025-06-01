@@ -125,25 +125,34 @@ class SupabaseClient {
                 console.log('No photo to upload');
             }
 
-            // Prepare application data
+            // Prepare application data with flexible JSON structure
             const submission = {
                 full_name: applicationData.fullName,
                 email: applicationData.email,
-                date_of_birth: applicationData.dateOfBirth,
-                gender: applicationData.gender,
-                sexual_orientation: JSON.stringify(applicationData.sexualOrientation),
                 photo_url: photoUrl,
-                favorite_color: applicationData.favoriteColor,
-                location: applicationData.location,
-                are_you_happy: applicationData.areYouHappy,
-                greatest_fear: applicationData.greatestFear,
-                fun_to_be_around: applicationData.funToBearound,
-                life_without_partner: applicationData.lifeWithoutPartner,
-                looking_for_here: applicationData.lookingForHere,
                 week_number: currentWeek,
                 year: currentYear,
                 submitted_at: new Date().toISOString(),
-                ip_address: await this.getClientIP()
+                ip_address: await this.getClientIP(),
+                // Store all form responses as JSON for flexibility
+                form_responses: JSON.stringify({
+                    dateOfBirth: applicationData.dateOfBirth,
+                    gender: applicationData.gender,
+                    sexualOrientation: applicationData.sexualOrientation,
+                    favoriteColor: applicationData.favoriteColor,
+                    location: applicationData.location,
+                    areYouHappy: applicationData.areYouHappy,
+                    greatestFear: applicationData.greatestFear,
+                    funToBearound: applicationData.funToBearound,
+                    lifeWithoutPartner: applicationData.lifeWithoutPartner,
+                    lookingForHere: applicationData.lookingForHere,
+                    // Add any other dynamic fields
+                    ...Object.fromEntries(
+                        Object.entries(applicationData).filter(([key]) => 
+                            !['fullName', 'email', 'photo', 'submittedAt'].includes(key)
+                        )
+                    )
+                })
             };
 
             console.log('Prepared submission data:', {
