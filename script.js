@@ -6,6 +6,9 @@ let deadlinePassed = false;
 let currentWeekQuestions = null;
 let DEADLINE = null;
 
+// Debug flag - set to true to disable duplicate checking (FOR TESTING ONLY)
+let DISABLE_DUPLICATE_CHECK = false;
+
 // DOM elements
 const landingPage = document.getElementById('landing-page');
 const applicationPage = document.getElementById('application-page');
@@ -296,7 +299,7 @@ function validateCurrentStep() {
         if (field.type === 'date' && field.value.trim()) {
             const birthDate = new Date(field.value);
             const today = new Date();
-            const age = today.getFullYear() - birthDate.getFullYear();
+            let age = today.getFullYear() - birthDate.getFullYear();
             const monthDiff = today.getMonth() - birthDate.getMonth();
             
             if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
@@ -349,6 +352,12 @@ async function validateStepWithDuplicateCheck() {
     // First do standard validation
     if (!validateCurrentStep()) {
         return false;
+    }
+    
+    // Skip duplicate check if debug flag is set
+    if (DISABLE_DUPLICATE_CHECK) {
+        console.log('Duplicate checking disabled for testing');
+        return true;
     }
     
     const email = document.getElementById('email').value.trim();
@@ -835,3 +844,84 @@ function formatFileSize(bytes) {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
+
+// Debug function to troubleshoot duplicate application issue
+async function debugDuplicateCheck(email) {
+    try {
+        const currentWeek = getCurrentWeek();
+        const currentYear = new Date().getFullYear();
+        
+        console.log('=== DUPLICATE CHECK DEBUG ===');
+        console.log('Email:', email);
+        console.log('Current Week:', currentWeek);
+        console.log('Current Year:', currentYear);
+        console.log('Current Date:', new Date().toISOString());
+        
+        // Initialize Supabase if needed
+        if (!supabaseClient.initialized) {
+            await supabaseClient.init();
+        }
+        
+        // Check for existing applications
+        const { data, error } = await supabaseClient.supabase
+            .from('applications')
+            .select('*')
+            .eq('email', email)
+            .order('submitted_at', { ascending: false });
+            
+        if (error) {
+            console.error('Error checking applications:', error);
+            return;
+        }
+        
+        console.log('All applications for this email:', data);
+        
+        // Filter by current week/year
+        const currentWeekApps = data.filter(app => 
+            app.week_number === currentWeek && app.year === currentYear
+        );
+        
+        console.log('Applications for current week/year:', currentWeekApps);
+        console.log('=== END DEBUG ===');
+        
+        return {
+            currentWeek,
+            currentYear,
+            allApplications: data,
+            currentWeekApplications: currentWeekApps
+        };
+        
+    } catch (error) {
+        console.error('Debug function error:', error);
+    }
+}
+
+// Debug function to clear applications for testing (DO NOT USE IN PRODUCTION)
+async function clearTestApplications(email) {
+    if (!confirm('Are you sure you want to delete all applications for this email? This cannot be undone!')) {
+        return;
+    }
+    
+    try {
+        if (!supabaseClient.initialized) {
+            await supabaseClient.init();
+        }
+        
+        const { data, error } = await supabaseClient.supabase
+            .from('applications')
+            .delete()
+            .eq('email', email);
+            
+        if (error) {
+            console.error('Error clearing applications:', error);
+        } else {
+            console.log('Applications cleared for email:', email);
+        }
+    } catch (error) {
+        console.error('Clear function error:', error);
+    }
+}
+
+// Add to window for easy access in console
+window.debugDuplicateCheck = debugDuplicateCheck;
+window.clearTestApplications = clearTestApplications;
